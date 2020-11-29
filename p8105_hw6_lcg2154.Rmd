@@ -1,0 +1,64 @@
+---
+title: "Homework 6 Solutions"
+author: Laura Gomez
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(p8105.datasets)
+library(dplyr)
+require(gridExtra)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = 0.6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+
+# Problem 1
+
+
+# Problem 2
+
+Import and tidy the following data set:
+```{r Birth_weight_df}
+Birth_weight_df = read_csv("./Data/birthweight (1).csv") %>%
+  mutate(babysex = as.character(babysex), babysex = case_when(babysex == 1 ~ "male", babysex == 2 ~ "female" )) %>%
+  mutate(frace = as.character(frace),
+    frace = case_when(
+      frace == 1 ~ "White", 
+      frace == 2 ~ "Black", 
+      frace == 3 ~ "Asian",
+      frace == 4 ~ "Puerto Rican",
+      frace == 8 ~ "Other",
+      frace == 9 ~ "Unknown"
+      )) %>%
+  mutate( malform = as.character(malform), malform = case_when(malform == 0 ~ "absent", malform == 1 ~ "present" ))  %>%
+  mutate( mrace = as.character(mrace), 
+          mrace = case_when(
+            mrace == 1 ~ "White", 
+            mrace == 2 ~ "Black",
+            mrace == 3 ~ "Asian",
+            mrace == 4 ~ "Puerto Rican",
+            mrace == 8 ~ "Other"
+            ))
+# Convert to the same measurement (i.e. pounds, grams)
+# Label with measurement
+# Check for missing values??
+```
+
