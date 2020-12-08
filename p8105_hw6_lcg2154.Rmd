@@ -57,8 +57,84 @@ Birth_weight_df = read_csv("./Data/birthweight (1).csv") %>%
             mrace == 4 ~ "Puerto Rican",
             mrace == 8 ~ "Other"
             ))
-# Convert to the same measurement (i.e. pounds, grams)
-# Label with measurement
-# Check for missing values??
+
+# Check for missing values?? ~drop_any
+```
+
+```{r}
+model_1fit = lm(bwt ~ gaweeks, data = Birth_weight_df)
+```
+
+```{r}
+Residual_predictions = Birth_weight_df %>% 
+  modelr::add_residuals(model_1fit) %>% 
+  modelr::add_predictions(model_1fit) %>%
+  select(resid,pred)
+
+  
+Plot = Residual_predictions %>% ggplot(aes(x = resid, y = pred)) + 
+  geom_point()
+Plot
+
+#X is residuals, y predictions ---> check plot 
+```
+
+Compare your model to two others:
+
+-One using length at birth and gestational age as predictors (main effects only)
+```{r}
+model_2fit = lm(bwt ~ blength + gaweeks, data = Birth_weight_df)
+#compare cross validation, graph
+```
+
+-One using head circumference, length, sex, and all interactions (including the three-way interaction) between these
+```{r}
+library(tidyverse)
+library(modelr)
+library(mgcv)
+
+model_3fit = lm(bwt ~ bhead * blength * babysex, data = Birth_weight_df) 
+
+cv_df = 
+  crossv_mc(Birth_weight_df, 100) 
+
+cv_df = 
+  cv_df %>% 
+  mutate(
+   model_3fit  = map(train, ~lm(bwt ~ bhead * blength * babysex, data = Birth_weight_df)), 
+   model_2fit = map(train, ~lm(bwt ~ blength + gaweeks, data = Birth_weight_df)),
+   model_1fit = map(train, ~lm(bwt ~ gaweeks, data = Birth_weight_df))) %>%
+  mutate(
+    rmse_3fit = map2_dbl(model_3fit, test, ~rmse(model = .x, data = .y)),
+    rmse_2fit = map2_dbl(model_2fit, test, ~rmse(model = .x, data = .y)),
+    rmse_1fitl = map2_dbl(model_1fit, test, ~rmse(model = .x, data = .y)))
+
+Compare_model_Plot = cv_df %>% 
+  select(starts_with("rmse")) %>% 
+  pivot_longer(
+    everything(),
+    names_to = "model", 
+    values_to = "rmse",
+    names_prefix = "rmse_") %>% 
+  mutate(model = fct_inorder(model)) %>% 
+  ggplot(aes(x = model, y = rmse)) + geom_violin()
+Compare_model_Plot
+
+```
+
+
+##Problem 3
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_NY"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
 ```
 
