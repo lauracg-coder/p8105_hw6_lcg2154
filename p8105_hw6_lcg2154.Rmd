@@ -105,7 +105,6 @@ models_results_df %>%
 
 
 
-
 # Problem 2
 
 Import and tidy the following data set:
